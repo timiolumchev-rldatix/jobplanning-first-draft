@@ -17,21 +17,21 @@ const JobPlanFinish = ({ comments, updateFormData, onFinish }: JobPlanFinishProp
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="text-center">
-        <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold">Almost Done!</h3>
-        <p className="text-gray-600">Review your job plan and add any final comments</p>
+        <CheckCircle className="h-12 w-12 sm:h-16 sm:w-16 text-green-500 mx-auto mb-4" />
+        <h3 className="text-base sm:text-lg font-semibold">Almost Done!</h3>
+        <p className="text-sm sm:text-base text-gray-600">Review your job plan and add any final comments</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Final Comments</CardTitle>
+          <CardTitle className="text-sm sm:text-base">Final Comments</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             <div>
-              <Label htmlFor="finalComments">
+              <Label htmlFor="finalComments" className="text-xs sm:text-sm">
                 Additional Comments or Notes (Optional)
               </Label>
               <Textarea
@@ -40,13 +40,13 @@ const JobPlanFinish = ({ comments, updateFormData, onFinish }: JobPlanFinishProp
                 onChange={handleCommentsChange}
                 rows={6}
                 placeholder="Add any additional comments, special requirements, or notes about this job plan..."
-                className="mt-2"
+                className="mt-2 text-xs sm:text-sm"
               />
             </div>
             
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-900 mb-2">What happens next?</h4>
-              <ul className="text-sm text-blue-800 space-y-1">
+            <div className="bg-blue-50 p-3 sm:p-4 rounded-lg">
+              <h4 className="font-medium text-blue-900 mb-2 text-sm sm:text-base">What happens next?</h4>
+              <ul className="text-xs sm:text-sm text-blue-800 space-y-1">
                 <li>• Your job plan will be created and saved</li>
                 <li>• You can review and edit it later if needed</li>
                 <li>• The plan can be shared with relevant stakeholders</li>
@@ -60,7 +60,7 @@ const JobPlanFinish = ({ comments, updateFormData, onFinish }: JobPlanFinishProp
       <div className="text-center">
         <Button
           onClick={onFinish}
-          className="nhs-blue text-white hover:bg-blue-700 px-8 py-2"
+          className="nhs-blue text-white hover:bg-blue-700 px-6 sm:px-8 py-2 text-xs sm:text-sm"
           size="lg"
         >
           Create Job Plan
