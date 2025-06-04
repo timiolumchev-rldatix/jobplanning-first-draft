@@ -1,18 +1,10 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useNavigate } from 'react-router-dom';
-import JobPlanBasicInfo from './JobPlanBasicInfo';
-import JobPlanObjectives from './JobPlanObjectives';
-import JobPlanResources from './JobPlanResources';
-import JobPlanActivities from './JobPlanActivities';
-import JobPlanSummary from './JobPlanSummary';
-import JobPlanFinish from './JobPlanFinish';
 
 const JobPlanForm = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('basic');
   const [formData, setFormData] = useState({
     title: '',
     hospital: '',
@@ -20,130 +12,144 @@ const JobPlanForm = () => {
     dccSessions: '',
     spaSessions: '',
     description: '',
-    objectives: [],
-    resources: [],
-    activities: [],
-    calendarActivities: [],
-    comments: ''
   });
 
-  const updateFormData = (section: string, data: any) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [section]: data
+      [name]: value
     }));
   };
 
-  const handleNext = () => {
-    const tabs = ['basic', 'objectives', 'resources', 'activities', 'summary', 'finish'];
-    const currentIndex = tabs.indexOf(activeTab);
-    if (currentIndex < tabs.length - 1) {
-      setActiveTab(tabs[currentIndex + 1]);
-    }
-  };
-
-  const handlePrevious = () => {
-    const tabs = ['basic', 'objectives', 'resources', 'activities', 'summary', 'finish'];
-    const currentIndex = tabs.indexOf(activeTab);
-    if (currentIndex > 0) {
-      setActiveTab(tabs[currentIndex - 1]);
-    }
-  };
-
-  const handleFinish = () => {
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     console.log('Job plan created:', formData);
+    // Here you would typically save the data
     navigate('/');
   };
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid w-full grid-cols-6">
-        <TabsTrigger value="basic">Basic Info</TabsTrigger>
-        <TabsTrigger value="objectives">Objectives</TabsTrigger>
-        <TabsTrigger value="resources">Resources</TabsTrigger>
-        <TabsTrigger value="activities">Activities</TabsTrigger>
-        <TabsTrigger value="summary">Summary</TabsTrigger>
-        <TabsTrigger value="finish">Finish</TabsTrigger>
-      </TabsList>
+    <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
+            Job Plan Title *
+          </label>
+          <input
+            type="text"
+            id="title"
+            name="title"
+            required
+            value={formData.title}
+            onChange={handleInputChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="e.g., Main Consultant Post"
+          />
+        </div>
 
-      <TabsContent value="basic" className="space-y-6">
-        <JobPlanBasicInfo 
-          formData={formData} 
-          updateFormData={updateFormData}
+        <div>
+          <label htmlFor="hospital" className="block text-sm font-medium text-gray-700 mb-2">
+            Hospital/Trust *
+          </label>
+          <input
+            type="text"
+            id="hospital"
+            name="hospital"
+            required
+            value={formData.hospital}
+            onChange={handleInputChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="e.g., Royal London Hospital"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="totalSessions" className="block text-sm font-medium text-gray-700 mb-2">
+            Total Sessions per Week *
+          </label>
+          <input
+            type="number"
+            id="totalSessions"
+            name="totalSessions"
+            required
+            min="1"
+            max="20"
+            value={formData.totalSessions}
+            onChange={handleInputChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="10"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="dccSessions" className="block text-sm font-medium text-gray-700 mb-2">
+            DCC Sessions *
+          </label>
+          <input
+            type="number"
+            id="dccSessions"
+            name="dccSessions"
+            required
+            min="0"
+            step="0.5"
+            value={formData.dccSessions}
+            onChange={handleInputChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="7.5"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="spaSessions" className="block text-sm font-medium text-gray-700 mb-2">
+            SPA Sessions *
+          </label>
+          <input
+            type="number"
+            id="spaSessions"
+            name="spaSessions"
+            required
+            min="0"
+            step="0.5"
+            value={formData.spaSessions}
+            onChange={handleInputChange}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="2.5"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+          Job Description
+        </label>
+        <textarea
+          id="description"
+          name="description"
+          rows={4}
+          value={formData.description}
+          onChange={handleInputChange}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Describe the main responsibilities and duties for this job plan..."
         />
-      </TabsContent>
+      </div>
 
-      <TabsContent value="objectives" className="space-y-6">
-        <JobPlanObjectives 
-          objectives={formData.objectives} 
-          updateFormData={updateFormData}
-        />
-      </TabsContent>
-
-      <TabsContent value="resources" className="space-y-6">
-        <JobPlanResources 
-          resources={formData.resources} 
-          updateFormData={updateFormData}
-        />
-      </TabsContent>
-
-      <TabsContent value="activities" className="space-y-6">
-        <JobPlanActivities 
-          activities={formData.activities}
-          calendarActivities={formData.calendarActivities}
-          updateFormData={updateFormData}
-        />
-      </TabsContent>
-
-      <TabsContent value="summary" className="space-y-6">
-        <JobPlanSummary formData={formData} />
-      </TabsContent>
-
-      <TabsContent value="finish" className="space-y-6">
-        <JobPlanFinish 
-          comments={formData.comments}
-          updateFormData={updateFormData}
-          onFinish={handleFinish}
-        />
-      </TabsContent>
-
-      <div className="flex justify-between mt-8 pt-6 border-t border-gray-200">
+      <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
         <Button
           type="button"
           variant="outline"
-          onClick={handlePrevious}
-          disabled={activeTab === 'basic'}
+          onClick={() => navigate('/')}
         >
-          Previous
+          Cancel
         </Button>
-        <div className="flex space-x-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate('/')}
-          >
-            Cancel
-          </Button>
-          {activeTab !== 'finish' ? (
-            <Button
-              type="button"
-              className="nhs-blue text-white hover:bg-blue-700"
-              onClick={handleNext}
-            >
-              Next
-            </Button>
-          ) : (
-            <Button
-              type="button"
-              className="nhs-blue text-white hover:bg-blue-700"
-              onClick={handleFinish}
-            >
-              Create Job Plan
-            </Button>
-          )}
-        </div>
+        <Button
+          type="submit"
+          className="nhs-blue text-white hover:bg-blue-700"
+        >
+          Create Job Plan
+        </Button>
       </div>
-    </Tabs>
+    </form>
   );
 };
 
