@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Plus, Edit, Eye } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const JobPlanOverview = () => {
   const jobPlans = [
@@ -54,10 +55,12 @@ const JobPlanOverview = () => {
         <CardTitle className="text-lg font-semibold text-gray-900">
           Current Job Plans
         </CardTitle>
-        <Button className="nhs-blue text-white hover:bg-blue-700">
-          <Plus className="h-4 w-4 mr-2" />
-          New Job Plan
-        </Button>
+        <Link to="/create-job-plan">
+          <Button className="nhs-blue text-white hover:bg-blue-700">
+            <Plus className="h-4 w-4 mr-2" />
+            New Job Plan
+          </Button>
+        </Link>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
