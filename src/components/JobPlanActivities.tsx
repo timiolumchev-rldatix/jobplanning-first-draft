@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,6 +57,7 @@ const JobPlanActivities = ({ activities, calendarActivities, updateFormData }: J
     activityType: 'Core' as const,
     startTime: '',
     endTime: '',
+    premiumHours: 0,
     entryMethod: 'weekly' as const,
     selectedWeeks: [] as number[],
     deliveredActivities: 0,
@@ -158,6 +160,7 @@ const JobPlanActivities = ({ activities, calendarActivities, updateFormData }: J
         activityType: 'Core',
         startTime: '',
         endTime: '',
+        premiumHours: 0,
         entryMethod: 'weekly',
         selectedWeeks: [],
         deliveredActivities: 0,
@@ -332,7 +335,7 @@ const JobPlanActivities = ({ activities, calendarActivities, updateFormData }: J
                   </div>
 
                   {/* Premium Hours Display */}
-                  {newActivity.premiumHours > 0 && (
+                  {newActivity.premiumHours && newActivity.premiumHours > 0 && (
                     <div className="bg-yellow-50 p-3 rounded-lg">
                       <p className="text-xs sm:text-sm text-yellow-800">
                         Premium time hours (19:00-06:00): {newActivity.premiumHours.toFixed(2)} hours
@@ -546,7 +549,7 @@ const JobPlanActivities = ({ activities, calendarActivities, updateFormData }: J
                             {activity.startTime && activity.endTime && (
                               <span>Time: {activity.startTime} - {activity.endTime}</span>
                             )}
-                            {activity.premiumHours > 0 && (
+                            {activity.premiumHours && activity.premiumHours > 0 && (
                               <span className="text-yellow-600">Premium: {activity.premiumHours.toFixed(2)}h</span>
                             )}
                             {activity.duration && <span>Duration: {activity.duration}</span>}
