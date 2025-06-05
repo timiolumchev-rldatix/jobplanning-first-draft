@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +6,8 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from '@/components/ui/calendar';
 import { Plus, Trash2, Calendar as CalendarIcon, List } from 'lucide-react';
 
@@ -19,6 +20,22 @@ interface Activity {
   category: 'DCC' | 'SPA' | 'Admin' | 'Research' | 'Teaching' | 'Other';
   date?: Date;
   time?: string;
+  // New fields for timetabled activities
+  activityFormat?: 'timetabled' | 'flexible';
+  activityType?: 'Core' | 'APA' | 'ATC';
+  startTime?: string;
+  endTime?: string;
+  premiumHours?: number;
+  entryMethod?: 'weekly' | 'annualised';
+  selectedWeeks?: number[];
+  deliveredActivities?: number;
+  travelTimeLinked?: boolean;
+  activityLocation?: string;
+  fromLocation?: string;
+  toLocation?: string;
+  personalObjective?: string;
+  employer?: string;
+  comment?: string;
 }
 
 interface JobPlanActivitiesProps {
@@ -34,7 +51,21 @@ const JobPlanActivities = ({ activities, calendarActivities, updateFormData }: J
     description: '',
     duration: '',
     frequency: '',
-    category: 'DCC' as const
+    category: 'DCC' as const,
+    activityFormat: 'timetabled' as const,
+    activityType: 'Core' as const,
+    startTime: '',
+    endTime: '',
+    entryMethod: 'weekly' as const,
+    selectedWeeks: [] as number[],
+    deliveredActivities: 0,
+    travelTimeLinked: false,
+    activityLocation: '',
+    fromLocation: '',
+    toLocation: '',
+    personalObjective: '',
+    employer: '',
+    comment: ''
   });
   const [newCalendarActivity, setNewCalendarActivity] = useState({
     title: '',
@@ -43,17 +74,101 @@ const JobPlanActivities = ({ activities, calendarActivities, updateFormData }: J
     category: 'DCC' as const
   });
 
+  // Sample data for dropdowns
+  const personalObjectives = [
+    'Improve patient satisfaction',
+    'Enhance clinical skills',
+    'Research publication',
+    'Teaching excellence',
+    'Quality improvement'
+  ];
+
+  const employers = [
+    'NHS Trust A',
+    'NHS Trust B',
+    'Private Hospital C',
+    'University Hospital D'
+  ];
+
   // Combine all activities for unified view
   const allActivities = [...activities, ...calendarActivities];
+
+  const calculatePremiumHours = (startTime: string, endTime: string) => {
+    if (!startTime || !endTime) return 0;
+    
+    const start = new Date(`2000-01-01T${startTime}`);
+    const end = new Date(`2000-01-01T${endTime}`);
+    
+    // Handle overnight shifts
+    if (end < start) {
+      end.setDate(end.getDate() + 1);
+    }
+    
+    const premiumStart = new Date(`2000-01-01T19:00`);
+    const premiumEnd = new Date(`2000-01-02T06:00`);
+    
+    const overlapStart = new Date(Math.max(start.getTime(), premiumStart.getTime()));
+    const overlapEnd = new Date(Math.min(end.getTime(), premiumEnd.getTime()));
+    
+    if (overlapStart < overlapEnd) {
+      return (overlapEnd.getTime() - overlapStart.getTime()) / (1000 * 60 * 60);
+    }
+    
+    return 0;
+  };
+
+  const handleActivityChange = (field: string, value: any) => {
+    setNewActivity(prev => {
+      const updated = { ...prev, [field]: value };
+      
+      // Calculate premium hours when start or end time changes
+      if (field === 'startTime' || field === 'endTime') {
+        const premiumHours = calculatePremiumHours(updated.startTime, updated.endTime);
+        updated.premiumHours = premiumHours;
+      }
+      
+      return updated;
+    });
+  };
+
+  const handleWeekSelection = (week: number, checked: boolean) => {
+    setNewActivity(prev => ({
+      ...prev,
+      selectedWeeks: checked 
+        ? [...prev.selectedWeeks, week].sort((a, b) => a - b)
+        : prev.selectedWeeks.filter(w => w !== week)
+    }));
+  };
 
   const addActivity = () => {
     if (newActivity.title.trim()) {
       const activity = {
         id: Date.now().toString(),
-        ...newActivity
+        ...newActivity,
+        premiumHours: calculatePremiumHours(newActivity.startTime, newActivity.endTime)
       };
       updateFormData('activities', [...activities, activity]);
-      setNewActivity({ title: '', description: '', duration: '', frequency: '', category: 'DCC' });
+      setNewActivity({
+        title: '',
+        description: '',
+        duration: '',
+        frequency: '',
+        category: 'DCC',
+        activityFormat: 'timetabled',
+        activityType: 'Core',
+        startTime: '',
+        endTime: '',
+        entryMethod: 'weekly',
+        selectedWeeks: [],
+        deliveredActivities: 0,
+        travelTimeLinked: false,
+        activityLocation: '',
+        fromLocation: '',
+        toLocation: '',
+        personalObjective: '',
+        employer: '',
+        comment: ''
+      });
     }
   };
 
@@ -118,13 +233,32 @@ const JobPlanActivities = ({ activities, calendarActivities, updateFormData }: J
               <CardTitle className="text-sm sm:text-base">Add New Activity</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
+              {/* Activity Format */}
+              <div>
+                <Label className="text-xs sm:text-sm">Activity Format *</Label>
+                <RadioGroup 
+                  value={newActivity.activityFormat} 
+                  onValueChange={(value) => handleActivityChange('activityFormat', value)}
+                  className="flex flex-row gap-4 mt-2"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="timetabled" id="timetabled" />
+                    <Label htmlFor="timetabled" className="text-xs sm:text-sm">Timetabled</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="flexible" id="flexible" />
+                    <Label htmlFor="flexible" className="text-xs sm:text-sm">Flexible</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="actTitle" className="text-xs sm:text-sm">Activity Title *</Label>
                   <Input
                     id="actTitle"
                     value={newActivity.title}
-                    onChange={(e) => setNewActivity(prev => ({ ...prev, title: e.target.value }))}
+                    onChange={(e) => handleActivityChange('title', e.target.value)}
                     placeholder="e.g., Outpatient clinic"
                     className="text-xs sm:text-sm"
                   />
@@ -132,7 +266,7 @@ const JobPlanActivities = ({ activities, calendarActivities, updateFormData }: J
                 
                 <div>
                   <Label htmlFor="actCategory" className="text-xs sm:text-sm">Category *</Label>
-                  <Select value={newActivity.category} onValueChange={(value) => setNewActivity(prev => ({ ...prev, category: value as any }))}>
+                  <Select value={newActivity.category} onValueChange={(value) => handleActivityChange('category', value)}>
                     <SelectTrigger className="text-xs sm:text-sm">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
@@ -146,38 +280,227 @@ const JobPlanActivities = ({ activities, calendarActivities, updateFormData }: J
                     </SelectContent>
                   </Select>
                 </div>
-
-                <div>
-                  <Label htmlFor="actDuration" className="text-xs sm:text-sm">Duration</Label>
-                  <Input
-                    id="actDuration"
-                    value={newActivity.duration}
-                    onChange={(e) => setNewActivity(prev => ({ ...prev, duration: e.target.value }))}
-                    placeholder="e.g., 3 hours"
-                    className="text-xs sm:text-sm"
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="actFrequency" className="text-xs sm:text-sm">Frequency</Label>
-                  <Input
-                    id="actFrequency"
-                    value={newActivity.frequency}
-                    onChange={(e) => setNewActivity(prev => ({ ...prev, frequency: e.target.value }))}
-                    placeholder="e.g., Weekly, Twice per week"
-                    className="text-xs sm:text-sm"
-                  />
-                </div>
               </div>
-              
+
+              {newActivity.activityFormat === 'timetabled' && (
+                <>
+                  {/* Activity Type */}
+                  <div>
+                    <Label className="text-xs sm:text-sm">Activity Type *</Label>
+                    <RadioGroup 
+                      value={newActivity.activityType} 
+                      onValueChange={(value) => handleActivityChange('activityType', value)}
+                      className="flex flex-row gap-4 mt-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="Core" id="core" />
+                        <Label htmlFor="core" className="text-xs sm:text-sm">Core</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="APA" id="apa" />
+                        <Label htmlFor="apa" className="text-xs sm:text-sm">APA</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="ATC" id="atc" />
+                        <Label htmlFor="atc" className="text-xs sm:text-sm">ATC</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  {/* Time Fields */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="startTime" className="text-xs sm:text-sm">Start Time *</Label>
+                      <Input
+                        id="startTime"
+                        type="time"
+                        value={newActivity.startTime}
+                        onChange={(e) => handleActivityChange('startTime', e.target.value)}
+                        className="text-xs sm:text-sm"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="endTime" className="text-xs sm:text-sm">End Time *</Label>
+                      <Input
+                        id="endTime"
+                        type="time"
+                        value={newActivity.endTime}
+                        onChange={(e) => handleActivityChange('endTime', e.target.value)}
+                        className="text-xs sm:text-sm"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Premium Hours Display */}
+                  {newActivity.premiumHours > 0 && (
+                    <div className="bg-yellow-50 p-3 rounded-lg">
+                      <p className="text-xs sm:text-sm text-yellow-800">
+                        Premium time hours (19:00-06:00): {newActivity.premiumHours.toFixed(2)} hours
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Entry Method */}
+                  <div>
+                    <Label className="text-xs sm:text-sm">Entry Method *</Label>
+                    <RadioGroup 
+                      value={newActivity.entryMethod} 
+                      onValueChange={(value) => handleActivityChange('entryMethod', value)}
+                      className="flex flex-row gap-4 mt-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="weekly" id="weekly" />
+                        <Label htmlFor="weekly" className="text-xs sm:text-sm">Weekly timetabled</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="annualised" id="annualised" />
+                        <Label htmlFor="annualised" className="text-xs sm:text-sm">Annualised</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  {/* Weekly Selection */}
+                  {newActivity.entryMethod === 'weekly' && (
+                    <div>
+                      <Label className="text-xs sm:text-sm">Select Weeks (1-26)</Label>
+                      <div className="grid grid-cols-6 sm:grid-cols-8 lg:grid-cols-13 gap-2 mt-2">
+                        {Array.from({ length: 26 }, (_, i) => i + 1).map(week => (
+                          <div key={week} className="flex items-center space-x-1">
+                            <Checkbox
+                              id={`week-${week}`}
+                              checked={newActivity.selectedWeeks.includes(week)}
+                              onCheckedChange={(checked) => handleWeekSelection(week, checked as boolean)}
+                            />
+                            <Label htmlFor={`week-${week}`} className="text-xs">{week}</Label>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Annualised Activities */}
+                  {newActivity.entryMethod === 'annualised' && (
+                    <div>
+                      <Label htmlFor="deliveredActivities" className="text-xs sm:text-sm">Number of Delivered Activities</Label>
+                      <Input
+                        id="deliveredActivities"
+                        type="number"
+                        step="0.1"
+                        value={newActivity.deliveredActivities}
+                        onChange={(e) => handleActivityChange('deliveredActivities', parseFloat(e.target.value) || 0)}
+                        placeholder="e.g., 10.5"
+                        className="text-xs sm:text-sm"
+                      />
+                    </div>
+                  )}
+
+                  {/* Location Details */}
+                  <div>
+                    <Label className="text-xs sm:text-sm">Travel Time Linked *</Label>
+                    <RadioGroup 
+                      value={newActivity.travelTimeLinked ? 'yes' : 'no'} 
+                      onValueChange={(value) => handleActivityChange('travelTimeLinked', value === 'yes')}
+                      className="flex flex-row gap-4 mt-2"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="yes" id="travel-yes" />
+                        <Label htmlFor="travel-yes" className="text-xs sm:text-sm">Yes</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="no" id="travel-no" />
+                        <Label htmlFor="travel-no" className="text-xs sm:text-sm">No</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  {newActivity.travelTimeLinked && (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      <div>
+                        <Label htmlFor="activityLocation" className="text-xs sm:text-sm">Activity Location</Label>
+                        <Input
+                          id="activityLocation"
+                          value={newActivity.activityLocation}
+                          onChange={(e) => handleActivityChange('activityLocation', e.target.value)}
+                          placeholder="Location name"
+                          className="text-xs sm:text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="fromLocation" className="text-xs sm:text-sm">From</Label>
+                        <Input
+                          id="fromLocation"
+                          value={newActivity.fromLocation}
+                          onChange={(e) => handleActivityChange('fromLocation', e.target.value)}
+                          placeholder="Starting location"
+                          className="text-xs sm:text-sm"
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="toLocation" className="text-xs sm:text-sm">To</Label>
+                        <Input
+                          id="toLocation"
+                          value={newActivity.toLocation}
+                          onChange={(e) => handleActivityChange('toLocation', e.target.value)}
+                          placeholder="Destination"
+                          className="text-xs sm:text-sm"
+                        />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Other Details */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="personalObjective" className="text-xs sm:text-sm">Personal Objective</Label>
+                      <Select value={newActivity.personalObjective} onValueChange={(value) => handleActivityChange('personalObjective', value)}>
+                        <SelectTrigger className="text-xs sm:text-sm">
+                          <SelectValue placeholder="Select objective" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {personalObjectives.map(objective => (
+                            <SelectItem key={objective} value={objective}>{objective}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="employer" className="text-xs sm:text-sm">Employer</Label>
+                      <Select value={newActivity.employer} onValueChange={(value) => handleActivityChange('employer', value)}>
+                        <SelectTrigger className="text-xs sm:text-sm">
+                          <SelectValue placeholder="Select employer" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {employers.map(employer => (
+                            <SelectItem key={employer} value={employer}>{employer}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Common fields for both timetabled and flexible */}
               <div>
                 <Label htmlFor="actDescription" className="text-xs sm:text-sm">Description</Label>
                 <Textarea
                   id="actDescription"
                   value={newActivity.description}
-                  onChange={(e) => setNewActivity(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) => handleActivityChange('description', e.target.value)}
                   placeholder="Detailed description of the activity"
                   rows={3}
+                  className="text-xs sm:text-sm"
+                />
+              </div>
+
+              <div>
+                <Label htmlFor="actComment" className="text-xs sm:text-sm">Comment</Label>
+                <Textarea
+                  id="actComment"
+                  value={newActivity.comment}
+                  onChange={(e) => handleActivityChange('comment', e.target.value)}
+                  placeholder="Additional comments"
+                  rows={2}
                   className="text-xs sm:text-sm"
                 />
               </div>
@@ -200,19 +523,40 @@ const JobPlanActivities = ({ activities, calendarActivities, updateFormData }: J
                         <div className="flex-1">
                           <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
                             <h5 className="font-medium text-sm sm:text-base">{activity.title}</h5>
-                            <span className={`inline-block px-2 py-1 text-xs rounded-full border ${getCategoryColor(activity.category)}`}>
-                              {activity.category}
-                            </span>
+                            <div className="flex flex-wrap gap-1">
+                              <span className={`inline-block px-2 py-1 text-xs rounded-full border ${getCategoryColor(activity.category)}`}>
+                                {activity.category}
+                              </span>
+                              {activity.activityType && (
+                                <span className="inline-block px-2 py-1 text-xs rounded-full border bg-gray-100 text-gray-800 border-gray-200">
+                                  {activity.activityType}
+                                </span>
+                              )}
+                              {activity.activityFormat && (
+                                <span className="inline-block px-2 py-1 text-xs rounded-full border bg-blue-100 text-blue-800 border-blue-200">
+                                  {activity.activityFormat}
+                                </span>
+                              )}
+                            </div>
                           </div>
                           {activity.description && (
                             <p className="text-xs sm:text-sm text-gray-600 mt-1">{activity.description}</p>
                           )}
                           <div className="flex flex-wrap gap-2 sm:gap-4 mt-2 text-xs sm:text-sm text-blue-600">
+                            {activity.startTime && activity.endTime && (
+                              <span>Time: {activity.startTime} - {activity.endTime}</span>
+                            )}
+                            {activity.premiumHours > 0 && (
+                              <span className="text-yellow-600">Premium: {activity.premiumHours.toFixed(2)}h</span>
+                            )}
                             {activity.duration && <span>Duration: {activity.duration}</span>}
                             {activity.frequency && <span>Frequency: {activity.frequency}</span>}
                             {activity.date && <span>Date: {activity.date.toLocaleDateString()}</span>}
                             {activity.time && <span>Time: {activity.time}</span>}
                           </div>
+                          {activity.comment && (
+                            <p className="text-xs sm:text-sm text-gray-500 mt-1 italic">{activity.comment}</p>
+                          )}
                         </div>
                         <Button
                           variant="outline"
