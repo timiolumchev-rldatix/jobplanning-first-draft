@@ -31,6 +31,11 @@ const JobPlanForm = () => {
     // Availability fields
     availableWeeks: '',
     availableDays: '',
+    // Special interests fields
+    specialty: '',
+    specialInterests: [],
+    // Other fields
+    uploadedFile: null,
     // Other sections
     objectives: [],
     resources: [],

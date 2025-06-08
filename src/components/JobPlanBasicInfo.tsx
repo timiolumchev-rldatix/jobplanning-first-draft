@@ -1,4 +1,3 @@
-
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -36,6 +35,37 @@ const JobPlanBasicInfo = ({ formData, updateFormData }: JobPlanBasicInfoProps) =
     }
     
     updateFormData('medicalTitles', updatedTitles);
+  };
+
+  const handleSpecialInterestChange = (interest: string, checked: boolean) => {
+    const currentInterests = formData.specialInterests || [];
+    let updatedInterests;
+    
+    if (checked) {
+      updatedInterests = [...currentInterests, interest];
+    } else {
+      updatedInterests = currentInterests.filter((i: string) => i !== interest);
+    }
+    
+    updateFormData('specialInterests', updatedInterests);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    updateFormData('uploadedFile', file);
+  };
+
+  const getSpecialInterestsBySpecialty = (specialty: string) => {
+    const specialtyInterests: { [key: string]: string[] } = {
+      'cardiology': ['Interventional Cardiology', 'Heart Failure', 'Arrhythmias', 'Cardiac Imaging'],
+      'oncology': ['Medical Oncology', 'Surgical Oncology', 'Radiation Oncology', 'Haematology'],
+      'neurology': ['Stroke Medicine', 'Epilepsy', 'Movement Disorders', 'Neuro-Oncology'],
+      'surgery': ['General Surgery', 'Orthopaedic Surgery', 'Plastic Surgery', 'Vascular Surgery'],
+      'psychiatry': ['Child Psychiatry', 'Forensic Psychiatry', 'Addiction Medicine', 'Psychotherapy'],
+      'emergency': ['Emergency Medicine', 'Trauma', 'Critical Care', 'Toxicology']
+    };
+    
+    return specialtyInterests[specialty] || [];
   };
 
   return (
@@ -338,6 +368,83 @@ const JobPlanBasicInfo = ({ formData, updateFormData }: JobPlanBasicInfoProps) =
               This value is used to calculate the occurrence of activities in the job plan.
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* Special Interests Section */}
+      <div className="space-y-4 sm:space-y-6 border-t pt-6">
+        <h3 className="text-lg font-medium text-gray-900">Special Interests</h3>
+        
+        <div className="space-y-4">
+          {/* Specialty */}
+          <div>
+            <Label className="text-xs sm:text-sm">Specialty</Label>
+            <Select
+              value={formData.specialty || ''}
+              onValueChange={(value) => {
+                handleSelectChange('specialty', value);
+                // Reset special interests when specialty changes
+                updateFormData('specialInterests', []);
+              }}
+            >
+              <SelectTrigger className="text-xs sm:text-sm">
+                <SelectValue placeholder="Select specialty" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="cardiology">Cardiology</SelectItem>
+                <SelectItem value="oncology">Oncology</SelectItem>
+                <SelectItem value="neurology">Neurology</SelectItem>
+                <SelectItem value="surgery">Surgery</SelectItem>
+                <SelectItem value="psychiatry">Psychiatry</SelectItem>
+                <SelectItem value="emergency">Emergency Medicine</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Special Interests - Only show if specialty is selected */}
+          {formData.specialty && (
+            <div className="space-y-3">
+              <Label className="text-xs sm:text-sm">Special Interests</Label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {getSpecialInterestsBySpecialty(formData.specialty).map((interest) => (
+                  <div key={interest} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`interest-${interest.toLowerCase().replace(/\s+/g, '-')}`}
+                      checked={(formData.specialInterests || []).includes(interest)}
+                      onCheckedChange={(checked) => handleSpecialInterestChange(interest, checked as boolean)}
+                    />
+                    <Label 
+                      htmlFor={`interest-${interest.toLowerCase().replace(/\s+/g, '-')}`}
+                      className="text-xs sm:text-sm"
+                    >
+                      {interest}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Other Section */}
+      <div className="space-y-4 sm:space-y-6 border-t pt-6">
+        <h3 className="text-lg font-medium text-gray-900">Other</h3>
+        
+        <div>
+          <Label htmlFor="fileUpload" className="text-xs sm:text-sm">Upload File</Label>
+          <Input
+            type="file"
+            id="fileUpload"
+            onChange={handleFileUpload}
+            className="text-xs sm:text-sm mt-2"
+            accept=".pdf,.doc,.docx,.txt"
+          />
+          {formData.uploadedFile && (
+            <p className="text-xs sm:text-sm text-gray-600 mt-2">
+              Selected: {formData.uploadedFile.name}
+            </p>
+          )}
         </div>
       </div>
     </div>
