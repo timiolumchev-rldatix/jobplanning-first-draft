@@ -4,6 +4,9 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { ChevronDown } from 'lucide-react';
 
 interface JobPlanBasicInfoProps {
   formData: any;
@@ -401,27 +404,50 @@ const JobPlanBasicInfo = ({ formData, updateFormData }: JobPlanBasicInfoProps) =
             </Select>
           </div>
 
-          {/* Special Interests - Only show if specialty is selected */}
+          {/* Special Interests - Multiselect Dropdown */}
           {formData.specialty && (
             <div className="space-y-3">
               <Label className="text-xs sm:text-sm">Special Interests</Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {getSpecialInterestsBySpecialty(formData.specialty).map((interest) => (
-                  <div key={interest} className="flex items-center space-x-2">
-                    <Checkbox
-                      id={`interest-${interest.toLowerCase().replace(/\s+/g, '-')}`}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-between text-xs sm:text-sm h-10"
+                  >
+                    {(formData.specialInterests || []).length > 0
+                      ? `${(formData.specialInterests || []).length} selected`
+                      : "Select special interests"
+                    }
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-full min-w-[300px]" align="start">
+                  <DropdownMenuLabel className="text-xs sm:text-sm">Special Interests</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {getSpecialInterestsBySpecialty(formData.specialty).map((interest) => (
+                    <DropdownMenuCheckboxItem
+                      key={interest}
                       checked={(formData.specialInterests || []).includes(interest)}
-                      onCheckedChange={(checked) => handleSpecialInterestChange(interest, checked as boolean)}
-                    />
-                    <Label 
-                      htmlFor={`interest-${interest.toLowerCase().replace(/\s+/g, '-')}`}
+                      onCheckedChange={(checked) => handleSpecialInterestChange(interest, checked)}
                       className="text-xs sm:text-sm"
                     >
                       {interest}
-                    </Label>
-                  </div>
-                ))}
-              </div>
+                    </DropdownMenuCheckboxItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {(formData.specialInterests || []).length > 0 && (
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {(formData.specialInterests || []).map((interest) => (
+                    <div 
+                      key={interest}
+                      className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-800 rounded-md text-xs"
+                    >
+                      {interest}
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>
