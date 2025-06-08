@@ -2,6 +2,9 @@
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface JobPlanBasicInfoProps {
   formData: any;
@@ -14,95 +17,280 @@ const JobPlanBasicInfo = ({ formData, updateFormData }: JobPlanBasicInfoProps) =
     updateFormData(name, value);
   };
 
+  const handleRadioChange = (name: string, value: string) => {
+    updateFormData(name, value);
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    updateFormData(name, value);
+  };
+
+  const handleCheckboxChange = (title: string, checked: boolean) => {
+    const currentTitles = formData.medicalTitles || [];
+    let updatedTitles;
+    
+    if (checked) {
+      updatedTitles = [...currentTitles, title];
+    } else {
+      updatedTitles = currentTitles.filter((t: string) => t !== title);
+    }
+    
+    updateFormData('medicalTitles', updatedTitles);
+  };
+
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-        <div>
-          <Label htmlFor="title" className="text-xs sm:text-sm">Job Plan Title *</Label>
-          <Input
-            id="title"
-            name="title"
-            required
-            value={formData.title}
-            onChange={handleInputChange}
-            placeholder="e.g., Main Consultant Post"
-            className="text-xs sm:text-sm"
-          />
+    <div className="space-y-6 sm:space-y-8">
+      {/* Basic Job Information */}
+      <div className="space-y-4 sm:space-y-6">
+        <h3 className="text-lg font-medium text-gray-900">Job Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+          <div>
+            <Label htmlFor="title" className="text-xs sm:text-sm">Job Plan Title *</Label>
+            <Input
+              id="title"
+              name="title"
+              required
+              value={formData.title}
+              onChange={handleInputChange}
+              placeholder="e.g., Main Consultant Post"
+              className="text-xs sm:text-sm"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="hospital" className="text-xs sm:text-sm">Hospital/Trust *</Label>
+            <Input
+              id="hospital"
+              name="hospital"
+              required
+              value={formData.hospital}
+              onChange={handleInputChange}
+              placeholder="e.g., Royal London Hospital"
+              className="text-xs sm:text-sm"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="totalSessions" className="text-xs sm:text-sm">Total Sessions per Week *</Label>
+            <Input
+              type="number"
+              id="totalSessions"
+              name="totalSessions"
+              required
+              min="1"
+              max="20"
+              value={formData.totalSessions}
+              onChange={handleInputChange}
+              placeholder="10"
+              className="text-xs sm:text-sm"
+            />
+          </div>
+
+          <div>
+            <Label htmlFor="dccSessions" className="text-xs sm:text-sm">DCC Sessions *</Label>
+            <Input
+              type="number"
+              id="dccSessions"
+              name="dccSessions"
+              required
+              min="0"
+              step="0.5"
+              value={formData.dccSessions}
+              onChange={handleInputChange}
+              placeholder="7.5"
+              className="text-xs sm:text-sm"
+            />
+          </div>
+
+          <div className="md:col-span-1">
+            <Label htmlFor="spaSessions" className="text-xs sm:text-sm">SPA Sessions *</Label>
+            <Input
+              type="number"
+              id="spaSessions"
+              name="spaSessions"
+              required
+              min="0"
+              step="0.5"
+              value={formData.spaSessions}
+              onChange={handleInputChange}
+              placeholder="2.5"
+              className="text-xs sm:text-sm"
+            />
+          </div>
         </div>
 
         <div>
-          <Label htmlFor="hospital" className="text-xs sm:text-sm">Hospital/Trust *</Label>
-          <Input
-            id="hospital"
-            name="hospital"
-            required
-            value={formData.hospital}
+          <Label htmlFor="description" className="text-xs sm:text-sm">Job Description</Label>
+          <Textarea
+            id="description"
+            name="description"
+            rows={4}
+            value={formData.description}
             onChange={handleInputChange}
-            placeholder="e.g., Royal London Hospital"
-            className="text-xs sm:text-sm"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="totalSessions" className="text-xs sm:text-sm">Total Sessions per Week *</Label>
-          <Input
-            type="number"
-            id="totalSessions"
-            name="totalSessions"
-            required
-            min="1"
-            max="20"
-            value={formData.totalSessions}
-            onChange={handleInputChange}
-            placeholder="10"
-            className="text-xs sm:text-sm"
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="dccSessions" className="text-xs sm:text-sm">DCC Sessions *</Label>
-          <Input
-            type="number"
-            id="dccSessions"
-            name="dccSessions"
-            required
-            min="0"
-            step="0.5"
-            value={formData.dccSessions}
-            onChange={handleInputChange}
-            placeholder="7.5"
-            className="text-xs sm:text-sm"
-          />
-        </div>
-
-        <div className="md:col-span-1">
-          <Label htmlFor="spaSessions" className="text-xs sm:text-sm">SPA Sessions *</Label>
-          <Input
-            type="number"
-            id="spaSessions"
-            name="spaSessions"
-            required
-            min="0"
-            step="0.5"
-            value={formData.spaSessions}
-            onChange={handleInputChange}
-            placeholder="2.5"
+            placeholder="Describe the main responsibilities and duties for this job plan..."
             className="text-xs sm:text-sm"
           />
         </div>
       </div>
 
-      <div>
-        <Label htmlFor="description" className="text-xs sm:text-sm">Job Description</Label>
-        <Textarea
-          id="description"
-          name="description"
-          rows={4}
-          value={formData.description}
-          onChange={handleInputChange}
-          placeholder="Describe the main responsibilities and duties for this job plan..."
-          className="text-xs sm:text-sm"
-        />
+      {/* Employment Section */}
+      <div className="space-y-4 sm:space-y-6 border-t pt-6">
+        <h3 className="text-lg font-medium text-gray-900">Employment</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Contract Version */}
+          <div className="space-y-3">
+            <Label className="text-xs sm:text-sm">Contract Version</Label>
+            <RadioGroup
+              value={formData.contractVersion || ''}
+              onValueChange={(value) => handleRadioChange('contractVersion', value)}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="2003" id="contract-2003" />
+                <Label htmlFor="contract-2003" className="text-xs sm:text-sm">2003 Contract</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="2023" id="contract-2023" />
+                <Label htmlFor="contract-2023" className="text-xs sm:text-sm">2023 Contract</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          {/* Employment Type */}
+          <div className="space-y-3">
+            <Label className="text-xs sm:text-sm">Employment Type</Label>
+            <RadioGroup
+              value={formData.employmentType || ''}
+              onValueChange={(value) => handleRadioChange('employmentType', value)}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="full-time" id="full-time" />
+                <Label htmlFor="full-time" className="text-xs sm:text-sm">Full time</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="part-time" id="part-time" />
+                <Label htmlFor="part-time" className="text-xs sm:text-sm">Part time</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          {/* Agreed PAs per week - Only show for part-time */}
+          {formData.employmentType === 'part-time' && (
+            <div>
+              <Label htmlFor="agreedPAs" className="text-xs sm:text-sm">Agreed PAs per week</Label>
+              <Input
+                type="number"
+                id="agreedPAs"
+                name="agreedPAs"
+                min="0"
+                step="0.1"
+                value={formData.agreedPAs || ''}
+                onChange={handleInputChange}
+                placeholder="e.g., 5.5"
+                className="text-xs sm:text-sm"
+              />
+            </div>
+          )}
+
+          {/* Usual Place of Work */}
+          <div>
+            <Label className="text-xs sm:text-sm">Usual Place of Work</Label>
+            <Select
+              value={formData.usualPlaceOfWork || ''}
+              onValueChange={(value) => handleSelectChange('usualPlaceOfWork', value)}
+            >
+              <SelectTrigger className="text-xs sm:text-sm">
+                <SelectValue placeholder="Select workplace" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="royal-london">Royal London Hospital</SelectItem>
+                <SelectItem value="barts-heart">Barts Heart Centre</SelectItem>
+                <SelectItem value="st-bartholomews">St Bartholomew's Hospital</SelectItem>
+                <SelectItem value="mile-end">Mile End Hospital</SelectItem>
+                <SelectItem value="newham">Newham University Hospital</SelectItem>
+                <SelectItem value="whipps-cross">Whipps Cross University Hospital</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Private Practice */}
+          <div className="space-y-3">
+            <Label className="text-xs sm:text-sm">Private Practice</Label>
+            <RadioGroup
+              value={formData.privatePractice || ''}
+              onValueChange={(value) => handleRadioChange('privatePractice', value)}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="yes" id="private-yes" />
+                <Label htmlFor="private-yes" className="text-xs sm:text-sm">Yes</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="no" id="private-no" />
+                <Label htmlFor="private-no" className="text-xs sm:text-sm">No</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          {/* Alternative Employer */}
+          <div className="space-y-3">
+            <Label className="text-xs sm:text-sm">Alternative Employer</Label>
+            <RadioGroup
+              value={formData.alternativeEmployer || ''}
+              onValueChange={(value) => handleRadioChange('alternativeEmployer', value)}
+            >
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="yes" id="alt-employer-yes" />
+                <Label htmlFor="alt-employer-yes" className="text-xs sm:text-sm">Yes</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="no" id="alt-employer-no" />
+                <Label htmlFor="alt-employer-no" className="text-xs sm:text-sm">No</Label>
+              </div>
+            </RadioGroup>
+          </div>
+
+          {/* Alternative Employer Name - Only show if Yes is selected */}
+          {formData.alternativeEmployer === 'yes' && (
+            <div>
+              <Label htmlFor="alternativeEmployerName" className="text-xs sm:text-sm">Alternative Employer Name</Label>
+              <Input
+                id="alternativeEmployerName"
+                name="alternativeEmployerName"
+                value={formData.alternativeEmployerName || ''}
+                onChange={handleInputChange}
+                placeholder="Enter employer name"
+                className="text-xs sm:text-sm"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Medical Titles */}
+        <div className="space-y-3">
+          <Label className="text-xs sm:text-sm">Medical Titles</Label>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[
+              'Clinical Academic',
+              'Honorary Doctor',
+              'Locum Doctor',
+              'Military Doctor'
+            ].map((title) => (
+              <div key={title} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`title-${title.toLowerCase().replace(' ', '-')}`}
+                  checked={(formData.medicalTitles || []).includes(title)}
+                  onCheckedChange={(checked) => handleCheckboxChange(title, checked as boolean)}
+                />
+                <Label 
+                  htmlFor={`title-${title.toLowerCase().replace(' ', '-')}`}
+                  className="text-xs sm:text-sm"
+                >
+                  {title}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );

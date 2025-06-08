@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -20,6 +19,16 @@ const JobPlanForm = () => {
     dccSessions: '',
     spaSessions: '',
     description: '',
+    // Employment fields
+    contractVersion: '',
+    employmentType: '',
+    agreedPAs: '',
+    usualPlaceOfWork: '',
+    privatePractice: '',
+    alternativeEmployer: '',
+    alternativeEmployerName: '',
+    medicalTitles: [],
+    // Other sections
     objectives: [],
     resources: [],
     activities: [],
