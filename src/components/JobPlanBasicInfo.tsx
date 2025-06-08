@@ -173,10 +173,11 @@ const JobPlanBasicInfo = ({ formData, updateFormData }: JobPlanBasicInfoProps) =
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Contract Version */}
           <div className="space-y-3">
-            <Label className="text-xs sm:text-sm">Contract Version</Label>
+            <Label className="text-xs sm:text-sm">Contract Version *</Label>
             <RadioGroup
               value={formData.contractVersion || ''}
               onValueChange={(value) => handleRadioChange('contractVersion', value)}
+              required
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="2003" id="contract-2003" />
@@ -191,10 +192,11 @@ const JobPlanBasicInfo = ({ formData, updateFormData }: JobPlanBasicInfoProps) =
 
           {/* Employment Type */}
           <div className="space-y-3">
-            <Label className="text-xs sm:text-sm">Employment Type</Label>
+            <Label className="text-xs sm:text-sm">Employment Type *</Label>
             <RadioGroup
               value={formData.employmentType || ''}
               onValueChange={(value) => handleRadioChange('employmentType', value)}
+              required
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="full-time" id="full-time" />
@@ -248,10 +250,11 @@ const JobPlanBasicInfo = ({ formData, updateFormData }: JobPlanBasicInfoProps) =
 
           {/* Private Practice */}
           <div className="space-y-3">
-            <Label className="text-xs sm:text-sm">Private Practice</Label>
+            <Label className="text-xs sm:text-sm">Private Practice *</Label>
             <RadioGroup
               value={formData.privatePractice || ''}
               onValueChange={(value) => handleRadioChange('privatePractice', value)}
+              required
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="yes" id="private-yes" />
@@ -266,10 +269,11 @@ const JobPlanBasicInfo = ({ formData, updateFormData }: JobPlanBasicInfoProps) =
 
           {/* Alternative Employer */}
           <div className="space-y-3">
-            <Label className="text-xs sm:text-sm">Alternative Employer</Label>
+            <Label className="text-xs sm:text-sm">Alternative Employer *</Label>
             <RadioGroup
               value={formData.alternativeEmployer || ''}
               onValueChange={(value) => handleRadioChange('alternativeEmployer', value)}
+              required
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="yes" id="alt-employer-yes" />
@@ -332,7 +336,7 @@ const JobPlanBasicInfo = ({ formData, updateFormData }: JobPlanBasicInfoProps) =
         
         <div className="space-y-4">
           <div>
-            <Label className="text-xs sm:text-sm font-medium">Number of weeks available for work</Label>
+            <Label className="text-xs sm:text-sm font-medium">Number of weeks available for work *</Label>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
               <div>
                 <Label htmlFor="availableWeeks" className="text-xs sm:text-sm text-gray-600">Weeks</Label>
@@ -342,6 +346,7 @@ const JobPlanBasicInfo = ({ formData, updateFormData }: JobPlanBasicInfoProps) =
                   name="availableWeeks"
                   min="0"
                   max="52"
+                  required
                   value={formData.availableWeeks || ''}
                   onChange={handleInputChange}
                   placeholder="e.g., 48"
@@ -356,6 +361,7 @@ const JobPlanBasicInfo = ({ formData, updateFormData }: JobPlanBasicInfoProps) =
                   name="availableDays"
                   min="0"
                   max="6"
+                  required
                   value={formData.availableDays || ''}
                   onChange={handleInputChange}
                   placeholder="e.g., 3"
