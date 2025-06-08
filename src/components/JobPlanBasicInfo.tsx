@@ -292,6 +292,54 @@ const JobPlanBasicInfo = ({ formData, updateFormData }: JobPlanBasicInfoProps) =
           </div>
         </div>
       </div>
+
+      {/* Availability Section */}
+      <div className="space-y-4 sm:space-y-6 border-t pt-6">
+        <h3 className="text-lg font-medium text-gray-900">Availability</h3>
+        
+        <div className="space-y-4">
+          <div>
+            <Label className="text-xs sm:text-sm font-medium">Number of weeks available for work</Label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+              <div>
+                <Label htmlFor="availableWeeks" className="text-xs sm:text-sm text-gray-600">Weeks</Label>
+                <Input
+                  type="number"
+                  id="availableWeeks"
+                  name="availableWeeks"
+                  min="0"
+                  max="52"
+                  value={formData.availableWeeks || ''}
+                  onChange={handleInputChange}
+                  placeholder="e.g., 48"
+                  className="text-xs sm:text-sm"
+                />
+              </div>
+              <div>
+                <Label htmlFor="availableDays" className="text-xs sm:text-sm text-gray-600">Days</Label>
+                <Input
+                  type="number"
+                  id="availableDays"
+                  name="availableDays"
+                  min="0"
+                  max="6"
+                  value={formData.availableDays || ''}
+                  onChange={handleInputChange}
+                  placeholder="e.g., 3"
+                  className="text-xs sm:text-sm"
+                />
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+            <p className="text-xs sm:text-sm text-blue-800">
+              The number of weeks and days available to work excluding known leave entitlements. 
+              This value is used to calculate the occurrence of activities in the job plan.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

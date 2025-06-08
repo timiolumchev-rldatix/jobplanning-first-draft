@@ -28,6 +28,9 @@ const JobPlanForm = () => {
     alternativeEmployer: '',
     alternativeEmployerName: '',
     medicalTitles: [],
+    // Availability fields
+    availableWeeks: '',
+    availableDays: '',
     // Other sections
     objectives: [],
     resources: [],
