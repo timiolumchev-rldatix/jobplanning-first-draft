@@ -1,22 +1,34 @@
 // src/api.ts
-const BASE_URL = "https://6gdijwesul.execute-api.eu-west-2.amazonaws.com/prod";
+const API_BASE = 'https://6gdijwesul.execute-api.eu-west-2.amazonaws.com'; // Replace with your real endpoint if needed
 
-export async function addActivity(activityData: any) {
-  const res = await fetch(`${BASE_URL}/AddActivity`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(activityData),
+export async function addJobPlan(data: any) {
+  const response = await fetch(`${API_BASE}/add-job-plan`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
   });
-  if (!res.ok) throw new Error("Failed to add activity");
-  return await res.json();
+
+  if (!response.ok) {
+    throw new Error(`Failed to add job plan: ${response.statusText}`);
+  }
+
+  return response.json();
 }
 
-export async function addJobPlan(jobPlanData: any) {
-  const res = await fetch(`${BASE_URL}/AddJobPlan`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(jobPlanData),
+export async function addActivity(data: any) {
+  const response = await fetch(`${API_BASE}/add-activity`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
   });
-  if (!res.ok) throw new Error("Failed to add job plan");
-  return await res.json();
+
+  if (!response.ok) {
+    throw new Error(`Failed to add activity: ${response.statusText}`);
+  }
+
+  return response.json();
 }
